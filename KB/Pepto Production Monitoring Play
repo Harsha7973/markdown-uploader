@@ -1,0 +1,113 @@
+Source tag : https://rndwiki.inc.hpicorp.net/confluence/spaces/pepto/pages/1784975485/Pepto+Production+Monitoring+Playbook+-+2026
+  <input_source_tag>
+
+Note : This extracted file is generated from SharePoint or Wiki content. If the source document contains images, charts, or graphical elements, they may not be fully converted into Markdown format. For complete clarity, please refer to the original source using the source tag provided above.
+
+# Pepto Production Monitoring Playbook - 2026
+
+The Monitoring Documents can be referred in the following Locations.
+
+- Pepto Daily Monitoring - [Cloudwatch_Alerts_Daily_Monitoring.docx](https://rndwiki.inc.hpicorp.net/confluence/download/attachments/1365327058/Cloudwatch_Alerts_Daily_Monitoring.docx?version=4&modificationDate=1716978779000&api=v2)
+- Pepto Playbook - [Cloudwatch_Alerts_Playbook.docx](https://rndwiki.inc.hpicorp.net/confluence/download/attachments/1365327058/Cloudwatch_Alerts_Playbook.docx?version=2&modificationDate=1695637253000&api=v2)
+
+## Pepto Production monitoring parameters
+
+### dataos-core-prod account (828361281741):
+
+- **URL:** [https://awsconsole.hpicloud.net/](https://awsconsole.hpicloud.net/)
+- **Load Balancer Name:** k8s-peptoprod-b6aa4e3c88
+- **Role:** facade-prod-admin-role
+- **Load Balancer:**
+  - Check Total Request Count
+  - P99 Statistics - Target Response Time
+  - 4xx
+  - TargetConnectionErrorCount
+  - TargetTLSNegotiationErrors
+- **Cloudwatch:**
+  - All Alarms: Critical, 5xx, waf
+- **ElastiCache:**
+  - k8s-pds-even-redis-production
+  - k8s-pds-odd-redis-production
+  - CPU, Memory, Item Count
+
+### Health check of pods - K8S Dashboard
+
+- **URL:** [https://tools-apps.hpdataos.com/tools/dashboard/#/pod?namespace=pds-prod](https://tools-apps.hpdataos.com/tools/dashboard/#/pod?namespace=pds-prod)
+- **Namespaces:** pds-prod, facade-prod, facade-pie, facade-stg
+- For facade-prod, the count of pods should not be greater than 15.
+- For pds-prod, the count of pods should not be greater than 20.
+
+### CPU and Memory usage of pods - Grafana Dashboard
+
+- **URL:** [https://tools-apps.hpdataos.com/tools/grafana/d/85a562078cdf77779eaa1add43ccec1e/kubernetes-compute-resources-namespace-pods?orgId=1&refresh=10s&var-datasource=default&var-cluster=&var-namespace=pds-prod](https://tools-apps.hpdataos.com/tools/grafana/d/85a562078cdf77779eaa1add43ccec1e/kubernetes-compute-resources-namespace-pods?orgId=1&refresh=10s&var-datasource=default&var-cluster=&var-namespace=pds-prod)
+- **Namespaces:** pds-prod, facade-prod, facade-pie, facade-stg
+
+### EKS alerts - Prometheus Dashboard
+
+- **URL:** [https://tools-apps.hpdataos.com/tools/prometheus/alerts?search=](https://tools-apps.hpdataos.com/tools/prometheus/alerts?search=)
+
+---
+
+### :cscranalytics-prod (386531209764)
+
+- **Cloudwatch:** All Alarms: Firehose
+- **Lambda [cscranalytics-prod-alpaca-prod]:** Invocations, Error count & success rate
+
+---
+
+### cscrpds-prod (767701275976)
+
+- **S3:**
+  - cscrpds-prod-mq-landing-bulk
+  - cscrpds-prod-mq-landing
+  - Data should be stored continuously
+
+---
+
+## E2 Archive Pipelines
+
+### Delta Pipelines
+
+- pepto-archive-delta-1A01-prod: [Job Link](https://dataos-prod.cloud.databricks.com/jobs/409995093927856?o=3337297011599809)
+- pepto-archive-delta-1A02-prod: [Job Link](https://dataos-prod.cloud.databricks.com/jobs/752478895566260?o=3337297011599809)
+- pepto-archive-delta-1A03-prod: [Job Link](https://dataos-prod.cloud.databricks.com/jobs/634176795970780?o=3337297011599809)
+- pepto-archive-delta-1A20-prod: [Job Link](https://dataos-prod.cloud.databricks.com/jobs/1104773358607471?o=3337297011599809)
+- pepto-archive-delta-legalhold-prod: [Job Link](https://dataos-prod.cloud.databricks.com/jobs/896709900965403?o=3337297011599809)
+
+### Json Pipeline
+
+- pepto-archive-1A20-prod: [Job Link](https://dataos-prod.cloud.databricks.com/jobs/887012?o=3337297011599809)
+
+### DBR Pipelines
+
+### CDM Pipelines
+
+- pepto-cdm-privacy-object-to-elasticache-24hour-prod: [Job Link](https://dataos-prod.cloud.databricks.com/jobs/884309278370088?o=3337297011599809)
+- pepto-cdm-privacy-object-to-elasticache-prod: [Job Link](https://dataos-prod.cloud.databricks.com/jobs/903725521867631?o=3337297011599809)
+
+### Alpaca Pipelines
+
+- pepto-alpaca-data-to-csv-2-prod: [Job Link](https://dataos-prod.cloud.databricks.com/jobs/71217872812239?o=3337297011599809)
+- pepto-alpaca-data-to-csv-prod: [Job Link](https://dataos-prod.cloud.databricks.com/jobs/197322134327334?o=3337297011599809)
+
+### Missing Hour Pipeline
+
+- Missing Hours Pepto Cumulus: [Job Link](https://dataos-prod.cloud.databricks.com/jobs/500821911644724?o=3337297011599809)
+
+---
+
+### Email
+
+- Any Victor-Ops alerts for EKS or any other critical email
+
+---
+
+### OpenSearch
+
+- pds cronjob: [Dashboard](https://facade-prod-opensearch.hpdataos.com/_dashboards/goto/8662b4482ca35db4e767f7281686112a?security_tenant=global)
+- pds valve cronjob:
+  - redis loading: [Dashboard](https://facade-prod-opensearch.hpdataos.com/_dashboards/goto/0430ff84145b0c6d2b06a8aa4db6053b?security_tenant=global)
+  - redis load: [Dashboard](https://facade-prod-opensearch.hpdataos.com/_dashboards/goto/10e9caccf0ac10a371aefd13a137294d?security_tenant=global)
+- facade valve cronjob:
+  - redis loading: [Dashboard](https://facade-prod-opensearch.hpdataos.com/_dashboards/goto/8faacf60abde8fdc573f2dbed5c5f4eb?security_tenant=global)
+  - redis load: [Dashboard](https://facade-prod-opensearch.hpdataos.com/_dashboards/goto/e2ff7c313d9c7c97ea58cb6171646869?security_tenant=global)
