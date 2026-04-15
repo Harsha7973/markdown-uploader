@@ -1,0 +1,45 @@
+Source tag : 
+      https://rndwiki.inc.hpicorp.net/confluence/spaces/pepto/pages/1492080132/PDS-Prod+Cronjob+failure 
+
+Note : This extracted file is generated from SharePoint or Wiki content. If the source document contains images, charts, or graphical elements, they may not be fully converted into Markdown format. For complete clarity, please refer to the original source using the source tag provided above.
+
+# PDS-Prod Cronjob failure
+
+It is observed that the PDS-prod cronjob is failing with attached:
+
+MountDevice failed to create newCsiDriverClient: driver name esf.csi.aws.com not found in the list of registered CSI driver.
+
+The issue has been posted in tools and support and it is been identified that the prod cronjobs do not have node selector and tolerations defined.
+
+**MD, Dawud (CW):** PDS Cronjob is failing
+Posted in DataOS PlatformOps (Public) / Support - Tools and Services on 25 March 2024 06:27
+
+To resolve the prod cronjobs failure the node selector has been defined and merged to master:
+
+https://github.azc.ext.hp.com/hp-data-platform/dataos-prod-terragrunt/blob/11ee9f02685ed26e59e8c76e577f8f4b80bab5ef/dataos-core-prod/us-west-2/prod/eks/core-apps/green/cluster-nodes-v2/managed_nodes.hcl.json#L215
+
+The same above node selector has been updated in both application code PDS prod (cronjob and valve-cronjob) and facade-prod (valve-cronjob):
+
+- Facade-prod valve cronjob:
+  - https://github.azc.ext.hp.com/cscr-bigdata/facade_pds_config_k8s/blob/fc96f5ae813f74a08afb46913a088ad367ebaa88/k8s-config/facade-k8s-valve-cronjob/facade-prod.yml#L37
+- PDS-prod cronjob:
+  - https://github.azc.ext.hp.com/cscr-bigdata/facade_pds_config_k8s/blob/fc96f5ae813f74a08afb46913a088ad367ebaa88/k8s-config/pds-k8s-cronjob/pds-prod.yml#L95
+- PDS-prod valve-cronjob:
+  - https://github.azc.ext.hp.com/cscr-bigdata/facade_pds_config_k8s/blob/fc96f5ae813f74a08afb46913a088ad367ebaa88/k8s-config/pds-k8s-valve-cronjob/pds-prod.yml#L9
+
+The config master-merged can be seen updated in cronjob helm-release file.
+
+---
+
+References:
+
+- [Teams Message](https://teams.microsoft.com/l/message/19:0a68e0d5ce7140d9a0bf8801897eb0ad@thread.tacv2/1711328275839?tenantId=ca7981a2-785a-463d-b82a-3db87dfc3ce6&groupId=afbf175f-7f96-445e-9bc6-6ddcc1ee4942&parentMessageId=1711328275839&teamName=DataOS%20PlatformOps%20(Public)&channelName=Support%20-%20Tools%20and%20Services&createdTime=1711328275839)
+- [Node Selector Update 1](https://github.azc.ext.hp.com/hp-data-platform/dataos-prod-terragrunt/blob/11ee9f02685ed26e59e8c76e577f8f4b80bab5ef/dataos-core-prod/us-west-2/prod/eks/core-apps/green/cluster-nodes-v2/managed_nodes.hcl.json#L215)
+- [Node Selector Update 2](https://github.azc.ext.hp.com/hp-data-platform/dataos-prod-terragrunt/blob/11ee9f02685ed26e59e8c76e577f8f4b80bab5ef/dataos-core-prod/us-west-2/prod/eks/core-apps/green/cluster-nodes-v2/managed_nodes.hcl.json#L215)
+- [Node Selector Update 3](https://github.azc.ext.hp.com/hp-data-platform/dataos-prod-terragrunt/blob/11ee9f02685ed26e59e8c76e577f8f4b80bab5ef/dataos-core-prod/us-west-2/prod/eks/core-apps/green/cluster-nodes-v2/managed_nodes.hcl.json#L215)
+- [Facade-prod valve cronjob](https://github.azc.ext.hp.com/cscr-bigdata/facade_pds_config_k8s/blob/fc96f5ae813f74a08afb46913a088ad367ebaa88/k8s-config/facade-k8s-valve-cronjob/facade-prod.yml#L37)
+- [Facade-prod valve cronjob (repeat)](https://github.azc.ext.hp.com/cscr-bigdata/facade_pds_config_k8s/blob/fc96f5ae813f74a08afb46913a088ad367ebaa88/k8s-config/facade-k8s-valve-cronjob/facade-prod.yml#L37)
+- [PDS-prod cronjob](https://github.azc.ext.hp.com/cscr-bigdata/facade_pds_config_k8s/blob/fc96f5ae813f74a08afb46913a088ad367ebaa88/k8s-config/pds-k8s-cronjob/pds-prod.yml#L95)
+- [PDS-prod cronjob (repeat)](https://github.azc.ext.hp.com/cscr-bigdata/facade_pds_config_k8s/blob/fc96f5ae813f74a08afb46913a088ad367ebaa88/k8s-config/pds-k8s-cronjob/pds-prod.yml#L95)
+- [PDS-prod valve-cronjob](https://github.azc.ext.hp.com/cscr-bigdata/facade_pds_config_k8s/blob/fc96f5ae813f74a08afb46913a088ad367ebaa88/k8s-config/pds-k8s-valve-cronjob/pds-prod.yml#L90)
+- [PDS-prod valve-cronjob (repeat)](https://github.azc.ext.hp.com/cscr-bigdata/facade_pds_config_k8s/blob/fc96f5ae813f74a08afb46913a088ad367ebaa88/k8s-config/pds-k8s-valve-cronjob/pds-prod.yml#L90)
