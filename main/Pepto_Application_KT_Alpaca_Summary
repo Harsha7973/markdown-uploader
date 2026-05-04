@@ -1,0 +1,63 @@
+Source tag : 
+      
+Note : This extracted file is generated from SharePoint or Wiki content. If the source document contains images, charts, or graphical elements, they may not be fully converted into Markdown format. For complete clarity, please refer to the original source using the source tag provided above.
+
+# Pepto – Alpaca Pipeline KT
+
+## Overview
+
+This KT explains the Alpaca data pipeline used in Pepto for cache population. It covers architecture, Databricks processing, Lambda handling, ElasticCache storage, and the deployment process.
+
+## High-Level Architecture
+
+- Alpaca team delivers raw data to an Alpaca S3 bucket.
+- Databricks jobs process this data to derive:
+  - device_uid
+  - privacy_object
+- Processed data is written to a consent S3 bucket in multiple partitions.
+- Each partition triggers an AWS Lambda.
+- Lambda compresses data and pushes it to Redis (ElasticCache).
+
+## Databricks Processing
+
+- Reads data from Alpaca S3 (Delta tables).
+- Filters only required purpose IDs.
+- Groups data by device subject ID.
+- Handles very large datasets (700M+ records).
+- Splits data into even/odd sets based on ANSYS value.
+
+## Why Even/Odd Split
+
+- Single cache cannot handle full dataset size.
+- Even ANSYS values → Even Redis cluster.
+- Odd ANSYS values → Odd Redis cluster.
+
+## Consent Bucket
+
+- Output written in 8k–22k partitions.
+- Each file triggers a separate Lambda execution.
+
+## Lambda Function
+
+- Triggered by S3 write events.
+- Compresses payload using zlib (Base64).
+- Writes compressed data to Redis with TTL (~30 hours).
+- Validates connectivity to both even and odd caches.
+
+## ElasticCache Monitoring
+
+- Two Redis clusters: Even and Odd.
+- Monitor CPU and memory closely.
+- Alert team if memory exceeds ~85%.
+
+## Deployment Flow
+
+1. Update Databricks notebook (feature or main branch).
+2. Update job cluster configuration repo.
+3. Update deployment config repo.
+4. Manually trigger Azure DevOps pipeline.
+5. Validate job execution in Databricks UI.
+
+## Outcome
+
+This KT helps engineers understand Alpaca’s role in cache population, how massive datasets are processed safely, and how failures are monitored and mitigated.
