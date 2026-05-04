@@ -1,0 +1,77 @@
+Source tag : 
+      
+Note : This extracted file is generated from SharePoint or Wiki content. If the source document contains images, charts, or graphical elements, they may not be fully converted into Markdown format. For complete clarity, please refer to the original source using the source tag provided above.
+
+# Pepto – Code Workflow (Clone, Push & Pull)
+
+## Overview
+
+This KT explains the end-to-end developer workflow for making code changes in Pepto, starting from cloning repositories to pushing changes, building Docker images, and validating deployments in Dev.
+
+## Repositories Involved
+
+- Application Code Repository (CSCRAWS Pepto / PDS)
+- Docker Image Repository (PDS KS / Facade KS)
+- Configuration Repository (KS Config)
+- Deployment Repository (KS Core Apps – Dev/ITG/Prod)
+
+## Local Setup
+
+- Install Git, Node.js, and VS Code
+- Clone required repositories into a structured local folder
+- Ensure access to GitHub, Azure DevOps, and Copilot
+
+## Code Change Workflow
+
+1. Clone the repository or open existing local repo.
+2. Checkout `k8s-master` branch (source of truth).
+3. Run `git fetch` to sync latest changes.
+4. Create a feature branch using naming convention: `feature/<name>`.
+5. Make required code changes.
+6. Validate changes using:
+   - `git status`
+   - `git diff`
+7. Stage changes using `git add`.
+8. Commit with meaningful comments.
+9. Push feature branch to GitHub.
+
+## Branching Best Practices
+
+- Always branch from `k8s-master`.
+- Feature branches do not require approval.
+- Same feature branch name must be used across:
+  - Code repository
+  - Docker repository
+
+## Docker Image Build Flow
+
+- Clone Docker image repository.
+- Checkout `master` and pull latest changes.
+- Create feature branch with same name as code branch.
+- Sync latest code commit into Docker repo.
+- Push changes to trigger automated Azure DevOps build.
+- Monitor build status and logs in Azure DevOps.
+
+## Deployment to Dev
+
+- Update Helm release files to point to feature branch image.
+- Create PR in deployment repo.
+- Get Pepto team approval.
+- Merge PR to trigger deployment.
+
+## Post-Deployment Validation
+
+- Kubernetes Dashboard: pod status, restarts
+- Grafana: CPU and memory usage
+- OpenSearch: request and error logs
+- S3: data landing verification
+
+## Testing
+
+- Use JMeter to simulate printer traffic.
+- Update host/IP for target environment.
+- Test core APIs: create project, get project, post message.
+
+## Outcome
+
+This KT enables engineers to confidently perform code changes, push updates, build Docker images, deploy to Dev, and validate functionality end-to-end.
