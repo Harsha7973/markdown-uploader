@@ -1,0 +1,92 @@
+Source tag : 
+      
+Note : This extracted file is generated from SharePoint or Wiki content. If the source document contains images, charts, or graphical elements, they may not be fully converted into Markdown format. For complete clarity, please refer to the original source using the source tag provided above.
+
+# Pepto – Missing Hours & Low Data KT
+
+## Overview
+This KT session covers investigation and resolution of missing hours and low‑volume data issues reported primarily by the Cumulus downstream team.
+
+## Reporting Channels
+- Cumulus Support Channel
+- Missing Hours Email Alerts
+- KLO Support Channel (via approvals)
+
+## Purpose of Missing Hours Check
+- Detect ingestion gaps before downstream processing starts.
+- Allow reprocessing within the buffer window.
+- Prevent permanent data loss.
+
+## Missing Hours Detection Flow
+- A Databricks job runs daily.
+- It validates whether all 24 hours of data are ingested.
+- If any hour is missing, an automated email is triggered.
+
+## Immediate Actions on Alert
+1. Pause other activities.
+2. Start investigation immediately.
+3. Respond to Cumulus and internal channels.
+
+## Investigation Order (End‑to‑End)
+1. **WAF:**
+   - Verify block count during missing hour window.
+2. **OpenSearch:**
+   - Check if requests reached the application.
+3. **Application (Kubernetes):**
+   - Check request reception and errors.
+4. **Firehose:**
+   - Validate incoming record count and alarms.
+5. **S3 Landing Bucket:**
+   - Manually verify raw data presence.
+6. **Archive Pipeline:**
+   - Check Databricks archive job status.
+   - Review bad record counts.
+
+## Two Key Scenarios
+- No data in OpenSearch:
+  → Source did not send data.
+- Data in OpenSearch but missing downstream:
+  → Pipeline or processing issue.
+
+## Retry & Recovery Logic
+- Archive pipeline maintains state tables.
+- Failed hours are retried automatically.
+- Persistent failures require manual reruns.
+
+## Low Data Volume Investigation
+- Compare counts with previous weeks/months.
+- Use dedicated Databricks notebooks.
+- Validate S3 counts at project and queue level.
+- Calculate percentage drop against baseline.
+
+## Queue Mapping
+- Cumulus reports via queue names.
+- Reference notebooks map queues to:
+  - Account ID
+  - Project ID
+  - Pipeline path
+
+## Validation Outcome Reporting
+- If counts match Cumulus:
+  → Confirm ingestion consistency.
+- If counts differ:
+  → Investigate application, WAF, or pipeline issues.
+
+## Infrastructure as Code Principle
+- All AWS services managed via Terraform repos.
+- No manual changes in AWS console.
+
+## Infra Repositories
+- Facade / PDS Infra (Dev & Prod)
+- Data Core Infra (Dev & Prod)
+
+## Change Process
+1. Create feature branch.
+2. Make Terraform changes.
+3. Monitor Azure pipeline.
+4. Raise PR.
+5. Get approval (Rahul / Platform team).
+6. Merge and validate changes.
+
+## Outcome
+This KT establishes a clear, repeatable process for diagnosing missing‑hour and low‑volume issues while ensuring accountability, traceability, and data integrity across the Pepto pipeline.
