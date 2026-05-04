@@ -1,0 +1,104 @@
+Source tag : 
+      
+Note : This extracted file is generated from SharePoint or Wiki content. If the source document contains images, charts, or graphical elements, they may not be fully converted into Markdown format. For complete clarity, please refer to the original source using the source tag provided above.
+
+# Pepto – Application KT (Repository & Deployment)
+
+## Overview
+This KT session covered the end‑to‑end process of making code changes in the Pepto application, building Docker images, and deploying changes across environments (Dev → Prod). It focused on repository structure, branching strategy, deployment workflow, and post‑deployment validation.
+
+## Business Context
+Pepto is a critical telemetry ingestion application. Any code or deployment change must follow a controlled and well‑defined process to ensure stability, traceability, and minimal production risk.
+
+## Repositories Involved
+- Code Repository: CSCRAWS Pepto (main application code)
+- Docker Repository: PDS Docker image repository
+- Configuration Repository: Environment‑specific configuration (rarely changed)
+- Deployment Repository: Kubernetes/Helm deployment files
+
+## Branching Strategy
+- Always treat the K8s master branch as the source of truth.
+- Developers must:
+  - Fetch latest changes (git fetch)
+  - Checkout k8s master
+  - Create a feature branch using naming convention: feature/<name>
+- The same feature branch name must be used in both:
+  - Code repository
+  - Docker repository
+
+## Code Change Workflow
+1. Clone the repository locally.
+2. Sync with latest master branch.
+3. Create a feature branch.
+4. Make code changes.
+5. Verify using:
+   - git status
+   - git diff
+6. Stage and commit changes with meaningful comments.
+7. Push feature branch to GitHub.
+
+## Docker Image Build Process
+- Docker repository is cloned separately.
+- Feature branch must match the code repository branch name.
+- After pushing changes to the Docker repo:
+  - Docker image build automatically triggers via Azure DevOps.
+- Engineers monitor build status and logs in Azure DevOps.
+- Successful builds generate versioned Docker images used for deployment.
+
+## Deployment Process (Dev First)
+- Deployments always start in the Dev environment.
+- Helm release files are updated to point to the feature branch Docker image.
+- Changes are applied for:
+  - Application deployment
+  - CronJobs
+  - Background jobs
+- A Pull Request (PR) is raised in the deployment repository.
+- At least one Pepto team member must approve the PR.
+- After approval, the PR is merged.
+
+## Kubernetes Deployment Behavior
+- New pods are created using the updated image.
+- Old pods are terminated automatically.
+- Engineers must validate:
+  - Pod status (Running / CrashLoopBackOff)
+  - Logs for code or configuration errors
+
+## Post‑Deployment Validation
+- Kubernetes Dashboard:
+  - Check pod health and restarts
+- Grafana:
+  - Monitor CPU and memory utilization
+- OpenSearch:
+  - Confirm logs and request flow
+- S3:
+  - Validate data landing
+
+## Application Testing (JMeter)
+- Since printers cannot send data to Dev, JMeter is used.
+- Predefined JMX files simulate real printer traffic.
+- Engineers must:
+  - Update host/IP for the target environment
+  - Connect via GlobalProtect VPN
+  - Execute API requests sequentially
+- Core endpoints tested include:
+  - Create Project
+  - Get Project
+  - Post Message
+
+## Issue Handling
+- Deployment failures may be caused by:
+  - Code errors
+  - Certificate issues
+  - Missing or invalid secrets
+- Debugging involves:
+  - Pod logs
+  - Deployment events
+  - Coordination with platform team if infra‑related
+
+## Approval and Governance
+- Feature branches do not require approval.
+- Deployment PRs require Pepto team approval.
+- Multiple validation checks are recommended before merging due to long deployment cycles.
+
+## Outcome
+This KT provided a complete understanding of the Pepto code‑to‑deployment lifecycle, enabling engineers to confidently implement, deploy, and validate application changes while following best practices.
