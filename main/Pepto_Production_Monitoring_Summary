@@ -1,0 +1,40 @@
+Source tag : 
+      
+Note : This extracted file is generated from SharePoint or Wiki content. If the source document contains images, charts, or graphical elements, they may not be fully converted into Markdown format. For complete clarity, please refer to the original source using the source tag provided above.
+
+# Pepto – Production Monitoring (KT2)
+
+## Overview
+This session focused on production monitoring activities for the Pepto platform, covering application health, data pipelines, cron jobs, data flow validation, alerts, and cache monitoring.
+
+## Business Context
+Pepto receives data from multiple client applications and processes it through various pipelines before serving it to downstream consumers. Continuous monitoring is required to ensure reliability and data accuracy.
+
+## Monitoring Scope and Responsibilities
+- Monitor application auto-scaling and pod utilization.
+- Validate cron job executions and log generation.
+- Monitor archive, delta, remediation, and validation pipelines.
+- Ensure continuous data flow from all clients.
+- Monitor Redis cache health and capacity.
+- Investigate alerts and coordinate with upstream teams.
+
+## Application and Pod Monitoring
+Applications have defined minimum and maximum pod limits. Normal pod ranges are observed, and sudden spikes require investigation of request volume, latency, and pod failures.
+
+## Cron Job Monitoring
+Cron jobs run for PDS and Facade applications, mainly handling Geo data updates into Redis. Monitoring involves checking job success status and validating expected daily log counts in OpenSearch.
+
+## Data Pipeline Monitoring
+Pipelines run either daily or every two hours depending on data volume. Monitoring focuses on execution success, runtime behavior, and bad record counts. Large anomalies trigger deeper analysis.
+
+## Missing Hours and Data Validation
+Dedicated pipelines detect missing hourly data. Failures generate alerts, and investigations include checking S3 paths, application health, and upstream sources.
+
+## Alerts and Firehose Monitoring
+CloudWatch alarms monitor data flow thresholds. Short-lived alerts may be ignored, while prolonged drops lead to detailed root cause analysis.
+
+## Redis Cache Monitoring
+Redis cache utilization is closely monitored, especially memory usage. Utilization beyond critical thresholds requires proactive action to avoid outages.
+
+## Outcome
+The session provided a hands-on understanding of Pepto production monitoring processes and prepared team members for ongoing production support duties.
