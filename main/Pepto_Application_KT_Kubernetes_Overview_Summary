@@ -1,0 +1,53 @@
+Source tag : 
+      
+Note : This extracted file is generated from SharePoint or Wiki content. If the source document contains images, charts, or graphical elements, they may not be fully converted into Markdown format. For complete clarity, please refer to the original source using the source tag provided above.
+
+# Pepto Application KT Kubernetes Overview Summary
+
+## Overview
+This KT session provided a high‑level overview of the Pepto Kubernetes architecture and the core ingestion flow. The focus was on how Pepto receives, validates, routes, and stores telemetry data from printers and related devices.
+
+## Business Context
+Pepto is a REST‑based data ingestion platform. It receives continuous telemetry data from printers, smart devices, and PCs. The platform is designed as a listener‑only application with no UI, making backend observability critical.
+
+## Core Applications
+- **Facade Application:**
+  - Handles legacy devices sending non‑JSON data (TXT, XML).
+  - Converts incoming payloads into JSON.
+  - Forwards normalized data to PDS.
+- **PDS (Pepto Data Service):**
+  - Handles modern devices sending JSON data.
+  - Enforces payload size limits and schema validation.
+
+## High-Level Data Flow
+1. Devices send data to Pepto REST endpoints.
+2. Requests pass through AWS WAF for validation and security filtering.
+3. ALB routes requests to Facade or PDS based on payload format.
+4. Facade converts legacy data to JSON and forwards it to PDS.
+5. PDS validates tokens using DynamoDB.
+6. Privacy data is fetched from Redis (populated by CDM & Alpaca pipelines).
+7. Data is written to S3 landing or bulk buckets via Firehose.
+
+## Supporting Services
+- **WAF:** Blocks invalid URLs and malicious traffic.
+- **ALB:** Routes traffic to appropriate target groups.
+- **OpenSearch:** Used for streaming logs and monitoring.
+- **ElasticCache (Redis):** Stores geolocation and privacy consent data.
+- **DynamoDB:** Validates project tokens.
+- **S3:** Final destination for ingested telemetry data.
+
+## AWS Account Segmentation
+- **Data Core Account:**
+  - Kubernetes, WAF, ALB, OpenSearch, ElasticCache
+- **CSR Analytics / PDS Account:**
+  - Firehose, DynamoDB, S3 landing buckets
+
+## Facade Code Structure (High Level)
+- Node.js application
+- Entry point: app.js
+- Routes defined per printer/client type
+- Per‑route validation and transformation logic
+- Common utility functions for JSON conversion and logging
+
+## Outcome
+This session established a strong architectural understanding of Pepto’s Kubernetes deployment and ingestion pipeline, laying the foundation for deeper dives into Facade and PDS implementations.
