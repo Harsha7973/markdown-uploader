@@ -1,0 +1,67 @@
+Source tag : 
+      
+Note : This extracted file is generated from SharePoint or Wiki content. If the source document contains images, charts, or graphical elements, they may not be fully converted into Markdown format. For complete clarity, please refer to the original source using the source tag provided above.
+
+# Pepto – API, Extensive & Load Testing KT
+
+## Overview
+This KT explains post-deployment validation for Pepto and Facade using API testing, extensive testing, and load testing before production release.
+
+## Testing Types
+1. API (Sanity) Testing
+2. Extensive (Negative) Testing
+3. Load & Performance Testing
+
+## API Testing (JMeter)
+- Uses common JMX files.
+- Separate test groups for:
+  - Facade endpoints
+  - PDS endpoints
+- Update host/IP based on Dev or ITG stack.
+- Execute APIs one-by-one initially.
+- Validate:
+  - HTTP 200 response
+  - No pod restarts
+  - Logs present in OpenSearch
+  - Data landed in S3
+
+## Extensive Testing
+- Around ~148 test cases (mainly PDS).
+- Sends invalid inputs intentionally.
+- Verifies proper 4xx error handling.
+- Ensures bad data is rejected safely.
+
+## Pre-Load Test Configuration
+- Perform in ITG stack only.
+- Set minReplica = maxReplica = 1.
+- Disable auto-scaling temporarily.
+- Increase max-per-day request limits.
+- Ensure instance types match production.
+
+## Load Testing Goals
+- Replicate per-pod production traffic.
+- Validate CPU, memory, response time (P99).
+- Ensure zero/near-zero error rate.
+
+## Load Execution
+- Trigger JMeter from remote desktop.
+- Run continuously for ~5 days.
+- Monitor via Grafana:
+  - CPU stability
+  - Memory leaks
+  - Throughput
+  - Response times
+
+## Auto-Scaling Testing
+- Increase max replicas gradually.
+- Increase load step-by-step.
+- Verify pods scale up and down smoothly.
+
+## Success Criteria
+- Stable memory and CPU.
+- No unexpected restarts.
+- Throughput matches baseline.
+- P99 within acceptable limits.
+
+## Outcome
+This KT ensures confidence that new changes are functionally correct, performance-safe, and production-ready.
