@@ -1,0 +1,81 @@
+Source tag : 
+      
+Note : This extracted file is generated from SharePoint or Wiki content. If the source document contains images, charts, or graphical elements, they may not be fully converted into Markdown format. For complete clarity, please refer to the original source using the source tag provided above.
+
+# Pepto – Application Monitoring (KT1)
+
+## Overview
+This session covered a detailed walkthrough of Pepto application monitoring, starting with a high-level architecture overview and moving into day-to-day monitoring practices across infrastructure, applications, and pipelines.
+
+## Business Context
+Pepto is a telemetry ingestion platform that receives data from HP printers, PCs, and smart applications. The system operates as a streaming application, where even small issues can directly impact downstream business analytics. Hence, proactive and continuous monitoring is critical.
+
+## High-Level Architecture
+- Telemetry data is received by the Pepto application deployed on Kubernetes.
+- Two services handle incoming data:
+  - **Facade**: Handles legacy devices sending non-JSON formats (text/XML) and converts them to JSON.
+  - **PDS**: Handles modern devices sending JSON data.
+- Data is streamed to S3 using Kinesis Firehose.
+- Supporting pipelines (CDM and Alpaca) enrich data with privacy consent information from Redis.
+- Archive pipelines transform, mask sensitive fields, and prepare data for downstream consumption.
+
+## Technology Stack
+- Application: Node.js
+- Platform: Kubernetes
+- Cloud Services: S3, DynamoDB, ALB, Firehose, Lambda, OpenSearch, ElasticCache (Redis), CloudWatch, WAF
+- Data Processing: Databricks (Python, Scala)
+- Monitoring Tools: Kubernetes Dashboard, Grafana, Prometheus, CloudWatch, OpenSearch
+
+## Application Monitoring (Kubernetes)
+- Monitor Facade (prod, stage, pay) and PDS (prod) environments.
+- Validate pod health: running state, zero restarts, correct versions.
+- Verify replica sets and auto-scaling behavior.
+- Ensure cron jobs run successfully (daily and scheduled jobs).
+- Manual visual checks are performed in addition to alerts due to the critical nature of streaming workloads.
+
+## Resource Monitoring (Grafana)
+- Monitor CPU and memory utilization at application and pod levels.
+- Auto-scaling triggers based on thresholds (CPU ~65%, memory ~70%).
+- Ensure utilization remains within expected limits under load.
+
+## Traffic and Load Monitoring (AWS ALB)
+- Monitor request count trends daily and weekly.
+- Validate request patterns against historical baselines (same weekday comparison).
+- Detect sudden spikes or drops to identify upstream or application issues.
+- Track P99 latency; expected response time is under 1 second.
+- Monitor 4xx and 5xx error trends for anomalies.
+
+## Security and WAF Monitoring
+- Requests pass through AWS WAF before reaching the application.
+- WAF rules block invalid routes, malformed requests, and unauthorized patterns.
+- Blocked request count should remain low and stable.
+- Continuous spikes require investigation of request sources or rule configuration.
+
+## Alerting and Observability
+- CloudWatch alarms configured for latency, error rates, CPU, memory, and pod health.
+- Alerts trigger emails when thresholds are breached and when recovered.
+- Prometheus is used for container-level alerts across Kubernetes namespaces.
+
+## Databricks Pipeline Monitoring
+- Monitor CDM, Alpaca, and Archive jobs for successful execution.
+- Validate job schedules (hourly, multi-hourly, daily runs).
+- Watch for abnormal execution times or repeated failures.
+- Investigate failures caused by data issues, cluster issues, or downstream dependencies.
+
+## Lambda Monitoring (Alpaca)
+- Alpaca Lambda functions are triggered by S3 events.
+- Monitor invocation count, error rate, and success rate.
+- Sustained errors may indicate Redis unavailability or data issues upstream.
+
+## Data Validation and Downstream Support
+- Pipelines include validation checks to detect missing or abnormal data volumes.
+- Data issues usually surface through abnormal runtimes, job failures, or downstream feedback.
+- Minor data volume changes are expected; significant drops trigger investigation.
+
+## Operational Notes
+- There is no single unified monitoring dashboard; engineers must check multiple tools.
+- A wiki page consolidates monitoring links and runbooks.
+- Manual monitoring combined with alerting ensures production stability.
+
+## Outcome
+The session provided a complete understanding of Pepto application architecture and the end-to-end monitoring approach required to keep the platform stable and reliable in production.
