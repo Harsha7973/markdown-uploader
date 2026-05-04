@@ -1,0 +1,76 @@
+Source tag : 
+      
+Note : This extracted file is generated from SharePoint or Wiki content. If the source document contains images, charts, or graphical elements, they may not be fully converted into Markdown format. For complete clarity, please refer to the original source using the source tag provided above.
+
+# Pepto – Production Deployment KT
+
+## Overview
+
+This KT session explained the complete production deployment workflow for Pepto applications, covering Facade and PDS deployments with a strict zero‑downtime approach.
+
+## Pre‑Production Requirements
+
+- All code must be fully tested in:
+  - Dev
+  - ITG
+- API, extensive, and load testing must pass.
+- Code must be reviewed by Pepto team members.
+
+## Production Deployment Flow
+
+1. Merge feature branch into k8s master.
+2. Validate merged code locally and in repositories.
+3. Sync Docker repository and trigger Azure DevOps build.
+4. Generate a release version upon master merge.
+5. Test release version again in Dev and ITG.
+
+## Testing Guidelines
+
+- PDS: API + Extensive + Load testing
+- Facade: API testing only
+- Test results must be updated in release tracking sheets and wiki.
+
+## Image Promotion
+
+- Release images are promoted to AWS ECR using Azure pipelines.
+- Only release‑tagged images are used for production.
+
+## Production Deployment Steps
+
+1. Update production deployment repo with release version.
+2. Raise PR and obtain approval.
+3. Keep monitoring dashboards open before merging:
+   - Kubernetes Dashboard
+   - Grafana
+   - Request Count & P99
+   - CloudWatch / Firehose alerts
+4. Merge deployment PR to trigger rollout.
+5. Monitor Helm release and pod rollout.
+
+## Deployment Characteristics
+
+- Rolling deployment with zero downtime.
+- New pods start before old pods terminate.
+- Load shifts automatically to new pods.
+
+## Rollback Strategy
+
+- Revert to last stable release version via deployment repo.
+- Redeploy old image immediately.
+- Conduct RCA and impact analysis.
+
+## Post‑Deployment Monitoring
+
+- Continuous monitoring for the rest of the day.
+- Hourly validation of health and traffic.
+- Final status update shared with team.
+
+## Governance
+
+- Production deployment requires team coordination.
+- Deployment meetings are mandatory.
+- No step can be skipped due to business criticality.
+
+## Outcome
+
+This session provided a step‑by‑step, production‑ready deployment checklist ensuring stability, traceability, and rapid rollback in case of failures.
