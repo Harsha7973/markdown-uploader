@@ -1,0 +1,87 @@
+Source tag : 
+      
+Note : This extracted file is generated from SharePoint or Wiki content. If the source document contains images, charts, or graphical elements, they may not be fully converted into Markdown format. For complete clarity, please refer to the original source using the source tag provided above.
+
+# Finding Root Cause KT
+
+## Overview
+This KT session focuses on systematic root‑cause analysis for production issues in the Pepto ecosystem. It emphasizes proactive monitoring, early communication, and a structured approach to isolating application vs platform problems.
+
+## Core Monitoring Principles
+- Monitoring must be done daily without misses.
+- Even small or intermittent issues must be reported early.
+- Missed issues can lead to major escalations and business impact.
+
+## Initial Triage Approach
+1. Inform the team immediately through Pepto channels.
+2. Identify whether the issue is:
+   - Application related (code / deployment)
+   - Platform related (infrastructure / AWS services)
+
+## Kubernetes-Level Investigation
+- Verify pod status: Running, Pending, CrashLoop, Terminating.
+- Check pod restarts and crash loops.
+- Access pod logs from Kubernetes dashboard.
+- Enable timestamped logs and auto‑refresh.
+- Download logs for deeper inspection if required.
+
+## Log Analysis Guidelines
+- Code issues show stack traces, file paths, and Node.js error lines.
+- Platform issues usually show connectivity errors (OpenSearch, Redis, DynamoDB, EFS).
+- Transient log messages must still be captured and reviewed.
+
+## Application vs Platform Issues
+### Application Indicators
+- Node stack traces
+- Validation errors
+- JSON transform failures
+
+### Platform Indicators
+- Secrets misconfiguration
+- Pod scheduling failures
+- Missing EC2 capacity
+- Service connectivity failures
+
+## Escalation Path
+- Application issues: Inform Navneet and proceed only after approval.
+- Platform issues: Report in Tools & Support and Pepto + DevOps channels.
+
+## Traffic & Performance Correlation
+- Monitor CPU and memory utilization in Grafana.
+- Verify autoscaling behavior.
+- Check request count graph patterns (no sudden drops).
+- Correlate request drops with:
+  - 4XX / 5XX errors
+  - WAF block increases
+  - ALB target health
+
+## Supporting Dashboards & Tools
+- Kubernetes Dashboard
+- Grafana
+- CloudWatch
+- WAF dashboards
+- OpenSearch
+- Prometheus
+
+## Cron Job Monitoring
+- Cron jobs run briefly and terminate quickly.
+- Failures are detected via VictorOps alerts.
+- Logs may not persist in Kubernetes.
+
+## Databricks & Downstream Checks
+- Monitor CDM, Alpaca, Archive pipelines.
+- Review notebook errors and cluster failures.
+- Redis availability is critical for CDM and Alpaca pipelines.
+
+## Lambda Monitoring
+- Track invocation success and error rate.
+- Debug errors via CloudWatch logs.
+- Common issue: Redis connectivity failure.
+
+## OpenSearch Health
+- Dashboard access must be available.
+- Cluster health must remain GREEN.
+- Red or Yellow states can cause log loss.
+
+## Outcome
+This KT provides a comprehensive, end‑to‑end troubleshooting framework ensuring faster incident resolution, reduced business impact, and disciplined production operations.
